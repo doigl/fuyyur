@@ -105,11 +105,11 @@ This endpoint returns a list of available questions, paginated by 10 together wi
 - Query-Parameter _page_ (Type int, default 1): controls the pagination. page=1 returns the first 10 questions, page=2 the questions 11-20, etc.
 - Request Parameter: none
 - Response: JSON-Object with the attributes:
-..- _categories_: a list of categories
-..- _current_category_: null
-..- _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
-..- _total_question_: the total number of questions in this category 
-..- _success_: boolean 
+  - _categories_: a list of categories
+  - _current_category_: null
+  - _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
+  - _total_question_: the total number of questions in this category 
+  - _success_: boolean 
 
 Example request:
 ```
@@ -217,14 +217,14 @@ Example response:
 To add a new question you can post all required information (question, answer, difficulty and category) in form of a JSON-Object to the /questions endpoint.
 
 - Request parameter: JSON-Object with the attributes
-..- _question_: <your question text>, string
-..- _answer_: <your answer text>, string
-..- _difficulty_: integer between 1 (very easy) to 5 (very hard)
-..- _category_: id of the category of the question, integer 
+  - _question_: <your question text>, string
+  - _answer_: <your answer text>, string
+  - _difficulty_: integer between 1 (very easy) to 5 (very hard)
+  - _category_: id of the category of the question, integer 
 - Response: JSON-Object with the attributes _created_ with the id of the newly created question and _success_ = True
 - Expectable errors: 
-..- 400 (missing information): if the request misses some of the required information
-..- 422 (unprocessable): request resulted in a database error
+  - 400 (missing information): if the request misses some of the required information
+  - 422 (unprocessable): request resulted in a database error
 
 Example request:
 ```
@@ -249,11 +249,11 @@ To search for questions, post the search-term to the /questions endpoint, result
 - Request parameter: JSON-Object with the attribute _searchTerm_ as a string
 - Query parameter: _page_ to control pagination, see above at GET /questions
 - Response: JSON-Object with the attributes:
-..- _categories_: a list of categories
-..- _current_category_: null
-..- _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
-..- _total_question_: the total number of questions found 
-..- _success_: boolean
+  - _categories_: a list of categories
+  - _current_category_: null
+  - _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
+  - _total_question_: the total number of questions found 
+  - _success_: boolean
 
 Example request:
 ```
@@ -292,8 +292,8 @@ To delete a question, send a DELETE request with the id of the question as a pat
 - Path parameter: id (int), identifier of the question to be deleted
 - Response: JSON-Object with the attributes _deleted_ and _success_
 - Expectable errors: 
-..- 404 (resource not found): if there is no question with the provided id
-..- 422 (unprocessable): request resulted in a database error
+  - 404 (resource not found): if there is no question with the provided id
+  - 422 (unprocessable): request resulted in a database error
 
 Example request:
 ```
@@ -317,8 +317,8 @@ This endpoint returns a dictionary of all available categories.
 
 - Request/path/query parameters: None
 - Response: JSON object with the attributes 
-..- _success_ as a boolean with True for success and False for an error and 
-..- _categories_ as a dictionary in which the keys are the ids and the values are the corresponding name of the category.
+  - _success_ as a boolean with True for success and False for an error and 
+  - _categories_ as a dictionary in which the keys are the ids and the values are the corresponding name of the category.
 
 
 Example request:
@@ -350,13 +350,13 @@ This endpoint return the questions of a specific category paginated by 10 questi
 - Path parameter cat_id (integer): ID of the category
 - Query parameter _page_ (integer): controls pagination, see above at GET /questions
 - Response: JSON-Object with the attributes:
-..- _categories_: a list of categories
-..- _current_category_: the id of the current category
-..- _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
-..- _total_question_: the total number of questions in this category 
-..- _success_: boolean 
+  - _categories_: a list of categories
+  - _current_category_: the id of the current category
+  - _questions_: a list of questions objects with the attributes  _id_, a _question_, an _answer_, a _difficulty_ and a _category_
+  - _total_question_: the total number of questions in this category 
+  - _success_: boolean 
 - Expectable errors:
-..- 404 (resource not found), if the number of questions is 0 or the page requested is out of bounds.
+  - 404 (resource not found), if the number of questions is 0 or the page requested is out of bounds.
 
 Example request:
 ```
@@ -418,13 +418,13 @@ A quiz is sequence of queries from one category or mixed from all categories.
 
 This endpoint delivers the next random question of a quiz in the demanded category that was not posed before in the quiz. The quiz is defined by the id of the category of questions and a list of previous questions.
 - Request parameter: JSON object with attributes
-..- _quiz_category_: Demanded category as a dict with attributes _id_ (integer) and _type_ (string). Choose _id_ = 0 for all categories
-..- _previous_questions_: List of previous question ids already posed in this quiz. Empty list at the beginning of the quiz
+  - _quiz_category_: Demanded category as a dict with attributes _id_ (integer) and _type_ (string). Choose _id_ = 0 for all categories
+  - _previous_questions_: List of previous question ids already posed in this quiz. Empty list at the beginning of the quiz
 - Response: JSON object including the next question and a success marker
-..- _question_: next question in quiz as a JSON object with attributes _id_ (int) _question_ (string), _answer_ (string), _category_ (int id of catgory) and _difficulty_ (int between 1 (very easy) and 5 (very hard)). This attribute is missing when there is no question left for the quiz.
-..- _success_: boolean with True for successful requests and False for errors
+  - _question_: next question in quiz as a JSON object with attributes _id_ (int) _question_ (string), _answer_ (string), _category_ (int id of catgory) and _difficulty_ (int between 1 (very easy) and 5 (very hard)). This attribute is missing when there is no question left for the quiz.
+  - _success_: boolean with True for successful requests and False for errors
 - Expectable errors:
-..- 400 (missing information): if the request data misses required information (_quiz_category_ and _previous_questions_) 
+  - 400 (missing information): if the request data misses required information (_quiz_category_ and _previous_questions_) 
 
 Example request:
 ```
@@ -444,6 +444,7 @@ Example response:
   },
   "success": true
 }
+```
 
 ## Testing
 To run the tests, run
