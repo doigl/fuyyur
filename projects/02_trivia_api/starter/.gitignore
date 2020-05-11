@@ -1,6 +1,18 @@
 .vscode
 __pycache__
 venv
+backend/.flaskenv
+backend/.flaskenv~
+backend/startTests.sh
+bin/
+frontend/node_modules/
+frontend/npm-debug.log
+lib/
+lib64
+pip-selfcheck.json
+pyvenv.cfg
+share/
+.gitignore																 
 
 # OS generated files #
 ######################

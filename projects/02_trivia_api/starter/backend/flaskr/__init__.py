@@ -10,6 +10,11 @@ from models import setup_db, Question, Category
 QUESTIONS_PER_PAGE = 10
 
 def paginate_results(selection,request):
+  """
+    Helper function supplies pagination of questions:
+    - selection: list of questions
+    - request: flask request including query parameter 'page' as int
+  """
   page = request.args.get('page',1,int)
   start = (page - 1) * QUESTIONS_PER_PAGE
   end = min(len(selection),start + QUESTIONS_PER_PAGE)
@@ -29,6 +34,9 @@ def create_app(test_config=None):
   '''
   @app.after_request
   def after_request(response):
+    """
+    Sets up CORS headers for all requests
+    """  
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
 
@@ -39,6 +47,9 @@ def create_app(test_config=None):
 
   @app.route('/categories')
   def get_categories():
+    """
+    Returns all available categories as a dictionary with keys as category id and values the corresponding category type 
+    """
     cats = Category.query.all()
     resp = {
       'success' : True,
@@ -54,6 +65,9 @@ def create_app(test_config=None):
 
   @app.route('/questions')
   def get_questions():
+    """
+    Returns all available questions paginated as 10 questions 
+    """
     
     all_questions = Question.query.order_by(Question.id).all()
     current_questions = paginate_results(all_questions,request)
@@ -84,6 +98,10 @@ def create_app(test_config=None):
 
   @app.route('/questions/<int:question_id>', methods=["DELETE"])
   def delete_question(question_id):
+    """
+    Deletes a question identified by question_id as int 
+    """
+
     question = Question.query.get(question_id)
     if question is None:
       abort(404)
@@ -104,7 +122,12 @@ def create_app(test_config=None):
   This removal will persist in the database and when you refresh the page. 
   '''
   @app.route('/questions',methods=["POST"])
-  def create_question():
+  def create_or_search_question():
+    """
+     creates a new question (with attributes question, answer, difficulty and category) 
+     or searches for questions with searchTerm in question or answer
+    """
+
     data = request.json
     question = data.get('question')
     answer = data.get('answer')
@@ -166,6 +189,10 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:cat_id>/questions')
   def get_questions_of_category(cat_id):
+    """
+    Returns all available questions of a category identified by id cat_id, paginated by 10 questions 
+    """
+
     all_questions = Question.query.order_by(Question.id).filter(Question.category==cat_id).all()
     current_questions = paginate_results(all_questions,request)
     if len(current_questions) == 0:
@@ -203,6 +230,11 @@ def create_app(test_config=None):
   '''
   @app.route('/quizzes', methods=["POST"])
   def get_quiz_question():
+    """
+    Returns the next random question of a quiz from a specific category (defined by dict quiz_category) 
+    that was not posed in this quiz before (defined by list previous_questions)  
+    """
+
     data = request.json
     prev_questions = data.get('previous_questions')
     category = data.get('quiz_category')
@@ -244,6 +276,10 @@ def create_app(test_config=None):
   '''
   @app.errorhandler(404)
   def not_found_404(error):
+    """
+    Errorhandler for 404 (ressource not found) error
+    """
+
     response = jsonify({'success': False,
                 'error': 404,
                 'message': 'resource not found'}), 404
@@ -251,6 +287,9 @@ def create_app(test_config=None):
 
   @app.errorhandler(405)
   def not_found_405(error):
+    """
+    Errorhandler for 405 (method not allowed) error
+    """
     response = jsonify({'success': False,
                 'error': 405,
                 'message': 'method not allowed'}), 405
@@ -258,6 +297,9 @@ def create_app(test_config=None):
 
   @app.errorhandler(422)
   def not_proccessable_422(error):
+    """
+    Errorhandler for 422 (request not proccessable) error
+    """
     response = jsonify({
       'success': False,
       'error': 422,
@@ -265,6 +307,10 @@ def create_app(test_config=None):
 
   @app.errorhandler(400)
   def bad_request_400(error):
+    """
+    Errorhandler for 400 (bad request) error, 
+    used in this API for missing information in the request
+    """
     response = jsonify({'success': False,
                 'error': 400,
                 'message': 'information missing'}), 400
