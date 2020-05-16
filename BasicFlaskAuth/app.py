@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 import json
 from functools import wraps
 from jose import jwt
@@ -7,9 +7,12 @@ from urllib.request import urlopen
 
 app = Flask(__name__)
 
-AUTH0_DOMAIN = @TODO_REPLACE_WITH_YOUR_DOMAIN
+AUTH0_DOMAIN = 'doigl.eu.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = @TODO_REPLACE_WITH_YOUR_API_AUDIENCE
+API_AUDIENCE = 'image'
+MAX_ATTEMPTS = 5
+
+previous_attempts = {}
 
 
 class AuthError(Exception):
@@ -22,6 +25,7 @@ def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
     auth = request.headers.get('Authorization', None)
+
     if not auth:
         raise AuthError({
             'code': 'authorization_header_missing',
@@ -105,20 +109,51 @@ def verify_decode_jwt(token):
             }, 400)
 
 
-def requires_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        token = get_token_auth_header()
-        try:
-            payload = verify_decode_jwt(token)
-        except:
-            abort(401)
-        return f(payload, *args, **kwargs)
+def check_permissions(permission, payload):
+    if "permissions" not in payload:
+        raise AuthError({
+                'code': 'no permissions',
+                'description': 'Permissions not in JWT'}, 400)
+    if permission not in payload["permissions"]:
+        raise AuthError({
+                'code': 'permission not found',
+                'description': 'You do not have the required permission'}, 403)
+    return True
 
-    return wrapper
 
-@app.route('/headers')
-@requires_auth
-def headers(payload):
-    print(payload)
-    return 'Access Granted'
+def check_number_of_requests(request):
+    client_ip = request.remote_addr
+    if client_ip not in previous_attempts:
+        previous_attempts[client_ip] = 0
+    else:
+        previous_attempts[client_ip] = previous_attempts[client_ip] + 1
+        print('previous attempts of this user: ', previous_attempts[client_ip])
+
+    if previous_attempts[client_ip] > MAX_ATTEMPTS:
+        raise AuthError({
+            'code': 'too many attempts',
+            'description': 'Too many false attempts.'
+        }, 401)
+    return True
+
+
+def requires_auth(permission=''):
+    def requires_auth_wrapper(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                token = get_token_auth_header()
+                payload = verify_decode_jwt(token)
+                check_permissions(permission, payload)
+            except:
+                abort(401)
+            return f(payload, *args, **kwargs)
+
+        return wrapper
+    return requires_auth_wrapper
+
+@app.route('/image')
+@requires_auth('get:image')
+def images(jwt):
+    print(jwt)
+    return jsonify({'success': True, 'image': 'here is your image'})
